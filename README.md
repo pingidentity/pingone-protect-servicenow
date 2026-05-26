@@ -2,61 +2,53 @@
 
 This repository contains the configuration steps and ServiceNow Scripted REST Resource script for creating ServiceNow incidents from PingOne Protect audit webhook events.
 
-The integration flow is:
-
-```text
-PingOne Protect audit event
-  -> PingOne webhook
-  -> ServiceNow Scripted REST API
-  -> ServiceNow incident
-```
-
 The included script processes PingOne Protect `RISK_EVALUATION.CREATED` events, filters for `HIGH` risk evaluations, and creates ServiceNow incidents with risk, user, device, network, location, and velocity details.
 
-Architecture
+## Architecture
 
-+-----------------------------------+
-| PingOne Protect                   |
-| Audit event generated             |
-| RISK_EVALUATION.CREATED           |
-+----------------+------------------+
-                 |
-                 | Audit webhook delivery
-                 v
-+-----------------------------------+
-| PingOne Webhook                   |
-| POST / JSON payload               |
-| Basic Auth to ServiceNow          |
-+----------------+------------------+
-                 |
-                 | HTTPS POST
-                 v
-+-----------------------------------+
-| ServiceNow Scripted REST API      |
-| /api/<namespace>/pingone_audit    |
-| /events                           |
-+----------------+------------------+
-                 |
-                 | Script processing
-                 v
-+-----------------------------------+
-| ServiceNow logic                  |
-| - Parse payload                   |
-| - Check event type                |
-| - Keep HIGH risk only             |
-| - Look up caller by email         |
-| - Assign Fraud Analysts group     |
-+----------------+------------------+
-                 |
-                 | Create incident
-                 v
-+-----------------------------------+
-| ServiceNow Incident               |
-| Category: security                |
-| Impact: 1                         |
-| Urgency: 1                        |
-| Enriched with risk details        |
-+-----------------------------------+
+```text
++--------------------------------------------------+
+| PingOne Protect                                  |
+| Audit event generated                            |
+| Event: RISK_EVALUATION.CREATED                   |
++------------------------+-------------------------+
+                         |
+                         | Audit webhook delivery
+                         v
++--------------------------------------------------+
+| PingOne Webhook                                  |
+| POST JSON payload                                |
+| Basic Authentication to ServiceNow               |
++------------------------+-------------------------+
+                         |
+                         | HTTPS POST
+                         v
++--------------------------------------------------+
+| ServiceNow Scripted REST API                     |
+| /api/<namespace>/pingone_audit/events            |
++------------------------+-------------------------+
+                         |
+                         | Script processing
+                         v
++--------------------------------------------------+
+| ServiceNow Logic                                 |
+| Parse payload                                    |
+| Check event type                                 |
+| Keep HIGH risk evaluations only                  |
+| Look up caller by email                          |
+| Assign Fraud Analysts group                      |
++------------------------+-------------------------+
+                         |
+                         | Create incident
+                         v
++--------------------------------------------------+
+| ServiceNow Incident                              |
+| Category: security                               |
+| Impact: 1                                        |
+| Urgency: 1                                       |
+| Enriched with risk details                       |
++--------------------------------------------------+
+```
 
 ## Repository Contents
 
